@@ -5,19 +5,20 @@ import { JSX } from "react";
 
 const ChatbotIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => {
   return (
-    <div
-        className={`relative w-12 h-12 mx-auto mb-2 rounded-xl ${
-            isActive ? "bg-blue-100" : "hover:bg-blue-50"
-        }`}
+    <Link
+      href="/chatbot"
+      className={`group relative w-12 h-12 mx-auto mb-2 rounded-xl cursor-pointer transition-colors overflow-hidden ${
+        isActive ? "bg-blue-50" : "hover:bg-blue-50"
+      }`}
     >
+      <div className="absolute inset-0 z-0 rounded-xl transition-colors" />
       <Image
         src={logo}
-        alt="Logo: Chatbot Icon"
-        fill
-        className="object-contain"
+        alt="Logo: ChatBot Icon"
+        className="object-contain z-10 relative" // Add p-2 to see hover effect
         priority
       />
-    </div>
+    </Link>
   );
 };
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import logo from "/public/assets/Denty.png";
+import Link from 'next/link';
 
 const HomeCard4 = ({ className = "" }) => {
     return (
@@ -19,9 +20,11 @@ const HomeCard4 = ({ className = "" }) => {
                 />
             </div>
             <div className="flex justify-center">
-                <button className="mt-1 w-72 px-4 py-2 bg-white/20 text-white rounded-3xl hover:bg-[#608cc4]/40 transition-colors duration-200">
-                    Chat with Denty!
-                </button>
+                <Link href="/chatbot">
+                    <button className="mt-1 w-72 px-4 py-2 bg-white/20 text-white rounded-3xl hover:bg-[#608cc4]/40 transition-colors duration-200">
+                        Chat with Denty!
+                    </button>
+                </Link>
             </div>
         </div>
     );

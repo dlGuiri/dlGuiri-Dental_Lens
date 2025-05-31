@@ -8,7 +8,7 @@ const ScanIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => 
     <Link
       href="/scan"
       className={`group relative w-12 h-12 mx-auto mb-2 rounded-xl cursor-pointer transition-colors overflow-hidden ${
-        isActive ? "bg-blue-100" : "hover:bg-blue-50"
+        isActive ? "bg-blue-50" : "hover:bg-blue-50"
       }`}
     >
       <div className="absolute inset-0 z-0 rounded-xl transition-colors" />

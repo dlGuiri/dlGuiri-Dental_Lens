@@ -5,3 +5,6 @@ torchvision
 Pillow
 python-multipart
 timm
+pydantic
+python-dotenv
+google-generativeai
