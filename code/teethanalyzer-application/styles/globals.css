@@ -20,10 +20,23 @@ a {
   text-decoration: none;
 }
 
-/* styles.css or globals.css */
 .filter-yellow {
   filter: sepia(1) saturate(4) hue-rotate(10deg);
 }
 .filter-dark-yellow {
   filter: sepia(1) saturate(5) brightness(0.6) hue-rotate(20deg);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #7ab8ff; /* or match your theme */
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

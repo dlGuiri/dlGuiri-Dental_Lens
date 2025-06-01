@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+
 type ChatMessageProps = {
   message: string;
   sender: "user" | "bot";
@@ -6,14 +8,30 @@ type ChatMessageProps = {
 const ChatMessage = ({ message, sender }: ChatMessageProps) => {
   const isUser = sender === "user";
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-2`}>
+    <div className={`flex items-center ${isUser ? "justify-end" : "justify-start"}`}>
+      {!isUser && (
+        <div className="mr-2 self-start -mt-1">
+          {/* bot avatar */}
+          <img src="/assets/Denty.png" alt="Bot" className="w-16 h-auto"/>
+        </div>
+      )}
+
       <div
-        className={`max-w-xs px-4 py-2 rounded-xl text-white ${
-          isUser ? "bg-blue-500" : "bg-gray-700"
+        className={`max-w-lg p-4 rounded-xl text-md whitespace-pre-wrap ${
+          isUser
+            ? "bg-white text-gray-800 rounded"
+            : "bg-white text-gray-800 rounded"
         }`}
       >
-        {message}
+        <ReactMarkdown>{message}</ReactMarkdown>
       </div>
+
+      {isUser && (
+        <div className="ml-2">
+          {/* user avatar */}
+          <img src="/assets/User Icon.png" alt="Bot" className="w-16 h-auto"/>
+        </div>
+      )}
     </div>
   );
 };

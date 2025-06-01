@@ -1,35 +1,37 @@
 import { useState } from "react";
 
-type TextBoxProps = {
+interface Props {
   onSend: (text: string) => void;
-};
+}
 
-const ChatTextBox = ({ onSend }: TextBoxProps) => {
+const ChatTextBox = ({ onSend }: Props) => {
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!input.trim()) return;
     onSend(input);
     setInput("");
   };
 
   return (
-    <div className="flex mt-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex p-3 bg-white rounded-2xl shadow mt-4"
+    >
       <input
-        type="text"
-        className="flex-1 border rounded-l-xl p-2"
+        className="flex-grow p-2 outline-none rounded-l-xl"
+        placeholder="Ask Denty"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        placeholder="Ask Denty something..."
       />
       <button
-        className="bg-blue-500 text-white px-4 rounded-r-xl"
-        onClick={handleSend}
+        type="submit"
+        className="bg-[#5cacf4] text-white px-4 py-2 rounded-r-xl hover:bg-[#4396f0]"
       >
         Send
       </button>
-    </div>
+    </form>
   );
 };
 

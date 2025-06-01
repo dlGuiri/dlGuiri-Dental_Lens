@@ -4,7 +4,7 @@ from PIL import Image
 import timm
 import io
 
-class_names = ['Calculus', 'Data Caries', 'Gingivitis', 'Hypodontia', 'Mouth Ulcer', 'Tooth Discoloration']
+class_names = ['Calculus', 'Dental Caries', 'Gingivitis', 'Hypodontia', 'Mouth Ulcer', 'Tooth Discoloration']
 MODEL_PATH = "inception_resnet_v2_oral_disease_classifier.pth"
 
 transform = transforms.Compose([
