@@ -15,7 +15,7 @@ const ScanIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => 
       <Image
         src={logo}
         alt="Logo: Scan Icon"
-        className="object-contain z-10 relative" // Add p-2 to see hover effect
+        className="object-contain z-10 relative"
         priority
       />
     </Link>
