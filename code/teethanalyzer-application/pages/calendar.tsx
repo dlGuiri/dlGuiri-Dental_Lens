@@ -1,17 +1,9 @@
-import dynamic from "next/dynamic";
-import Head from "next/head";
-
-const CalendarCard = dynamic(() => import("@/components/CalendarPage/CalendarCard"), { ssr: false });
+import Calendar from "@/components/CalendarPage/Calendar";
 
 export default function CalendarPage() {
   return (
-    <>
-      <Head>
-        <title>Calendar - Dental Lens</title>
-      </Head>
-      <div>
-        <CalendarCard />
-      </div>
-    </>
+    <div className="mt-1"> {/* Adjust mt-10 to your desired spacing */}
+      <Calendar />
+    </div>
   );
 }
