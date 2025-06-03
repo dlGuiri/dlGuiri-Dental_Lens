@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 
 const YouTubeSlider = dynamic(() => import("@/components/RecoPage/YouTubeSlider"), { ssr: false });
-
+//hello
 export default function YouTubeSliderPage() {
   return (
     <>

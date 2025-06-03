@@ -36,7 +36,7 @@ const YouTubeSlider: React.FC = () => {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     };
-
+      // hello
     scrollBarThumb.addEventListener("mousedown", handleMouseDown);
 
     const handleSlideButtons = () => {

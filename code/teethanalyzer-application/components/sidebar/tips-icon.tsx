@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "/public/assets/Tips Icon.png";
 import { JSX } from "react";
-
+//hello
 const TipsIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => {
   return (
     <Link
