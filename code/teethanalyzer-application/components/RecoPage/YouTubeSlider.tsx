@@ -73,16 +73,16 @@ const YouTubeSlider: React.FC = () => {
   };
 
   const videos = [
-    "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    "https://www.youtube.com/embed/3JZ_D3ELwOQ",
-    "https://www.youtube.com/embed/L_jWHffIx5E",
-    "https://www.youtube.com/embed/9bZkp7q19f0",
-    "https://www.youtube.com/embed/eY52Zsg-KVI",
-    "https://www.youtube.com/embed/fLexgOxsZu0",
-    "https://www.youtube.com/embed/fLexgOxsZu0",
-    "https://www.youtube.com/embed/fLexgOxsZu0",
-    "https://www.youtube.com/embed/fLexgOxsZu0",
-    "https://www.youtube.com/embed/fLexgOxsZu0"
+    "https://www.youtube.com/embed/fv-EGsNvNzc",
+  "https://www.youtube.com/embed/mXqlpP0gnaY",
+  "https://www.youtube.com/embed/Q0rOKZZ7Nas",
+  "https://www.youtube.com/embed/oxEoLkEMpnE",
+  "https://www.youtube.com/embed/Hkfxki3ywaU",
+  "https://www.youtube.com/embed/2yxa67n5JR4",
+  "https://www.youtube.com/embed/8_2LWMBs_Dw",
+  "https://www.youtube.com/embed/Qi-7ns4BfgM",
+  "https://www.youtube.com/embed/T0GGyYpnNmE",
+  "https://www.youtube.com/embed/aiWiA_zPDOk"
   ];
 
   return (
