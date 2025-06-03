@@ -64,7 +64,7 @@ const ScanPage = () => {
 
   return (
     <>
-      <div className="h-[370px] bg-gradient-to-br from-[#5789bf] via-[#74b0f0] to-[#d3eaff] 
+      <div className="h-[370px] bg-gradient-to-br from-[#4fa1f2] via-[#74b0f0] to-[#d3eaff] 
         backdrop-blur-md bg-opacity-30 rounded-3xl p-6 shadow-md hover:shadow-blue-300 
         transition-shadow duration-500"
       >
