@@ -16,7 +16,6 @@ const HomeCard4 = ({ className = "" }) => {
                     alt="Denty the Assistant"
                     width={220}
                     style={{ height: "auto" }}
-                    // className="rounded-full shadow-lg"
                 />
             </div>
             <div className="flex justify-center">
