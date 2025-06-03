@@ -4,10 +4,11 @@ import { gql, useMutation } from "@apollo/client";
 import React, { useState } from 'react';
 
 const CREATE_SCAN_RECORD = gql`
-  mutation CreateScanRecord($user: ID!, $result: String!) {
-    createScanRecord(user: $user, result: $result) {
+  mutation CreateScanRecord($user: ID!, $result: [String!]!, $notes: String) {
+    createScanRecord(user: $user, result: $result, notes: $notes) {
       _id
       result
+      notes
     }
   }
 `;
@@ -46,12 +47,24 @@ const ScanPage = () => {
       }
 
       const data = await response.json();
-      setPredictionResult(data.prediction);
+      const prediction = Array.isArray(data.prediction) ? data.prediction : [data.prediction];
+      setPredictionResult(prediction);
+
+      let notes = "";
+      if (prediction.length === 1 && prediction[0].toLowerCase() === "healthy") {
+        notes = "Healthy";
+      } else if (prediction.length === 1) {
+        notes = "Has 1 disease";
+      } else {
+        notes = `Has ${prediction.length} diseases`;
+      }
+      console.log("prediction:", prediction); // Should show something like ["Gingivitis"]
 
       await createScanRecord({
         variables: {
           user: "683135d97a2c370d25d861e0", // Replace with dynamic user ID if needed
-          result: data.prediction,
+          result: prediction,
+          notes,
         },
       });
     } catch (error) {

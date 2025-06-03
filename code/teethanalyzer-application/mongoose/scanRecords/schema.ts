@@ -19,9 +19,11 @@ export const ScanRecordSchema = new Schema(
         type: String,
       },
     ],
-    result: {
-      type: String,
-    },
+    result: [
+      {
+        type: String,
+      }
+    ],
   },
   { timestamps: true }
 );

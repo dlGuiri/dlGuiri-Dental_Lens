@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import logo from "/public/assets/Tooth Image V3.png";
 import arrow from "/public/assets/scan arrow V2.png";
@@ -21,16 +21,29 @@ const GET_USER_BY_ID = gql`
 
 const HomeCard1 = ({ className = "", metric = 100, userId }: { className?: string; metric?: number; userId: string }) => {
   const { predictionResult } = usePrediction();
-  const { data, loading, error } = useQuery(GET_USER_BY_ID, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_BY_ID, {
     variables: { userId },
   });
+
+  useEffect(() => {
+    if (predictionResult) {
+      refetch();
+    }
+  }, [predictionResult]);
 
   const name = data?.getUserById?.name || "User";
   const teethStatus = data?.getUserById?.teeth_status || "No Teeth Status Yet";
   const scanRecords = data?.getUserById?.scanRecords || ["N.D", "No Results Yet", "No Notes Yet"];
 
-  const displayResult = predictionResult ?? scanRecords[scanRecords.length - 1]?.result;
+  let displayResult = predictionResult ?? scanRecords[scanRecords.length - 1]?.result?.join(", ");
+  let recommendedAction = "Go to a dentist";
   const [showHistory, setShowHistory] = useState(false);
+
+  if (displayResult === "Healthy") {
+    displayResult = "None";
+    recommendedAction = "Continue current oral hygiene!";
+  }
+  
 
   // Filter classes to change the color of the tooth image based on the metric
   let filterClass = "";
@@ -84,11 +97,11 @@ const HomeCard1 = ({ className = "", metric = 100, userId }: { className?: strin
                       })}
                     </p>
                     {/* <p className="text-sm mb-1">Result: {scanRecords[0].result}</p> */}
-                    <p className="text-sm mb-1">Result: {displayResult}</p>
-                    <p className="text-sm mb-1">Additional Details:</p>
-                    <p className="text-sm mb-5">{scanRecords[0].notes}</p>
+                    <p className="text-sm mb-1">Result: {scanRecords.length > 0 ? scanRecords[scanRecords.length - 1].notes : "No Results yet"}</p>
+                    <p className="text-sm mb-1">Diseases Present:</p>
+                    <p className="text-sm mb-5">{displayResult}</p>
                     <p className="text-sm font-medium mb-2">Actions to be taken:</p>
-                    <p className="text-sm mb-1">Go to a dentist</p>
+                    <p className="text-sm mb-1">{recommendedAction}</p>
                   </>
                 ) : (
                   <p>No scans found.</p>
@@ -109,9 +122,11 @@ const HomeCard1 = ({ className = "", metric = 100, userId }: { className?: strin
                     day: "numeric",
                   })}
                 </p>
-                <p className="text-sm mb-1">Result: {scanRecords[0].result}</p>
-                <p className="text-sm mb-1">Additional Details:</p>
-                <p className="text-sm mb-1">{scanRecords[0].notes}</p>
+                <p className="text-sm mb-1">
+                  Result: {scanRecords[0].notes}
+                </p>
+                <p className="text-sm mb-1">Diseases Present:</p>
+                <p className="text-sm mb-1">{Array.isArray(scanRecords[0]?.result) ? scanRecords[0].result.join(", ") : scanRecords[0]?.result}</p>
               </>
             ) : (
               <p>No scans found.</p>

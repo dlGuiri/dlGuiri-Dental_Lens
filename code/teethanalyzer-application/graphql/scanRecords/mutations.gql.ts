@@ -4,7 +4,7 @@ export default /* GraphQL */ `
       date: String
       notes: String
       imageUrls: [String]
-      result: String
+      result: [String]
     ): ScanRecord
 
     updateScanRecord(
@@ -12,7 +12,7 @@ export default /* GraphQL */ `
       date: String
       notes: String
       imageUrls: [String]
-      result: String
+      result: [String]
     ): ScanRecord
 
     deleteScanRecord(recordId: ID!): ScanRecord

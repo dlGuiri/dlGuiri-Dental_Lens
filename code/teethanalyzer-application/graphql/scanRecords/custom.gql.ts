@@ -5,7 +5,7 @@ export default /* GraphQL */ `
     date: String
     notes: String
     imageUrls: [String]
-    result: String
+    result: [String]
     createdAt: String
     updatedAt: String
   }
