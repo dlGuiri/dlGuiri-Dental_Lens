@@ -1,3 +1,5 @@
+type Event = { id: string };
+
 type Props = {
   month: string;
   daysCount: number;
@@ -6,6 +8,7 @@ type Props = {
   onPrev: () => void;
   selectedDateId: string | null;
   onDateClick: (id: string) => void;
+  events: Event[];
 };
 
 export default function CalendarLeft({
@@ -16,13 +19,14 @@ export default function CalendarLeft({
   onPrev,
   selectedDateId,
   onDateClick,
+  events,
 }: Props) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const firstDayOfMonth = new Date(new Date().getFullYear(), monthIndex, 1).getDay(); // 0 (Sun) to 6 (Sat)
-  const adjustedFirstDay = new Date(new Date().getFullYear(), monthIndex, 1).getDay();
+  const firstDayOfMonth = new Date(new Date().getFullYear(), monthIndex, 1).getDay();
 
   return (
-    <div className="bg-[#7bbcf7] w-[750px] p-6 text-white h-[730px] rounded-tr-lg rounded-br-lg">
+    <div className="bg-gradient-to-br from-[#4fa1f2] via-[#74b0f0] to-[#66acf4] 
+      backdrop-blur-md bg-opacity-30 w-[750px] p-6 text-white h-[730px] rounded-tr-lg rounded-br-lg">
       <div className="flex justify-around mb-6">
         <button onClick={onPrev}>&lt;</button>
         <h1 className="text-lg">{month}</h1>
@@ -38,28 +42,31 @@ export default function CalendarLeft({
       </div>
 
       <div className="grid grid-cols-7 gap-y-2">
-        {Array.from({ length: adjustedFirstDay }).map((_, i) => (
+        {Array.from({ length: firstDayOfMonth }).map((_, i) => (
           <div key={`empty-${i}`} className="aspect-square"></div>
         ))}
-        
-        {Array.from({ length: daysCount }, (_, i) => {
-          const day = i + 1;         
 
+        {Array.from({ length: daysCount }, (_, i) => {
+          const day = i + 1;
           const id = `${day}${monthIndex}`;
+          const isSelected = selectedDateId === id;
+          const hasEvent = events.some((e) => e.id === id);
+
           return (
             <div
               key={id}
               onClick={() => onDateClick(id)}
               className="aspect-square flex items-center justify-center"
             >
-              <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
-                  selectedDateId === id
-                    ? "bg-white text-blue-500"
-                    : "text-white"
-                }`}
-              >
-                {day}
+              <div className="flex flex-col items-center justify-center">
+                <div
+                  className={`w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
+                    isSelected ? "bg-white text-blue-500" : "text-white"
+                  }`}
+                >
+                  {day}
+                </div>
+                {hasEvent && <div className="w-3 h-1 rounded-full bg-white -mt-1"/>}
               </div>
             </div>
           );
