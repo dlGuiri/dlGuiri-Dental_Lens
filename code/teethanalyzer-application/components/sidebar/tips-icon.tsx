@@ -6,7 +6,7 @@ import { JSX } from "react";
 const TipsIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => {
   return (
     <Link
-      href="/reco"
+      href="/recommended"
       className={`group relative w-12 h-12 mx-auto mb-2 rounded-xl cursor-pointer transition-colors overflow-hidden ${
         isActive ? "bg-blue-50" : "hover:bg-blue-50"
       }`}
