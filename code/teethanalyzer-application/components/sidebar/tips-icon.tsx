@@ -5,19 +5,20 @@ import { JSX } from "react";
 
 const TipsIcon = ({ isActive = false }: { isActive?: boolean }): JSX.Element => {
   return (
-    <div
-        className={`relative w-12 h-12 mx-auto mb-2 rounded-xl ${
-            isActive ? "bg-blue-50" : "hover:bg-blue-50"
-        }`}
+    <Link
+      href="/reco"
+      className={`group relative w-12 h-12 mx-auto mb-2 rounded-xl cursor-pointer transition-colors overflow-hidden ${
+        isActive ? "bg-blue-50" : "hover:bg-blue-50"
+      }`}
     >
+      <div className="absolute inset-0 z-0 rounded-xl transition-colors" />
       <Image
         src={logo}
         alt="Logo: Tips Icon"
-        fill
-        className="object-contain"
+        className="object-contain z-10 relative"
         priority
       />
-    </div>
+    </Link>
   );
 };
 
