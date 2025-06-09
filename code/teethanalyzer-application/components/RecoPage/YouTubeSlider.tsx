@@ -1,216 +1,218 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
-const YouTubeSlider: React.FC = () => {
-  const videoListRef = useRef<HTMLDivElement>(null);
-  const scrollBarThumbRef = useRef<HTMLDivElement>(null);
-  const prevButtonRef = useRef<HTMLButtonElement>(null);
-  const nextButtonRef = useRef<HTMLButtonElement>(null);
-  const scrollBarRef = useRef<HTMLDivElement>(null);
+// Custom arrow components
+const ChevronLeft = ({ size = 24, className }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+    <polyline points="15,18 9,12 15,6"></polyline>
+  </svg>
+);
 
+const ChevronRight = ({ size = 24, className }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+    <polyline points="9,18 15,12 9,6"></polyline>
+  </svg>
+);
+
+const Play = ({ size = 24, fill, className }: { size?: number; fill?: string; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+    <polygon points="5,3 19,12 5,21" fill={fill || "currentColor"}></polygon>
+  </svg>
+);
+
+interface Video {
+  id: string;
+  thumbnail: string;
+}
+
+const videos: Video[] = [
+  { id: "wrdEE8Br7Zk", thumbnail: "https://img.youtube.com/vi/wrdEE8Br7Zk/maxresdefault.jpg" },
+  { id: "WviE5aa5Ha0", thumbnail: "https://img.youtube.com/vi/WviE5aa5Ha0/maxresdefault.jpg" },
+  { id: "Qi-7ns4BfgM", thumbnail: "https://img.youtube.com/vi/Qi-7ns4BfgM/maxresdefault.jpg" },
+  { id: "4NcYkEfwoio", thumbnail: "https://img.youtube.com/vi/4NcYkEfwoio/maxresdefault.jpg" },
+  { id: "l22FVfim394", thumbnail: "https://img.youtube.com/vi/l22FVfim394/maxresdefault.jpg" },
+  { id: "aOebfGGcjVw", thumbnail: "https://img.youtube.com/vi/aOebfGGcjVw/maxresdefault.jpg" },
+  { id: "yNMqbL8B224", thumbnail: "https://img.youtube.com/vi/yNMqbL8B224/maxresdefault.jpg" },
+  { id: "cK726D70Sfg", thumbnail: "https://img.youtube.com/vi/cK726D70Sfg/maxresdefault.jpg" }
+];
+
+const YoutubeSlider = () => {
+  const [startIndex, setStartIndex] = useState(0);
+  const [mainVideo, setMainVideo] = useState(videos[0]);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [visibleThumbnails, setVisibleThumbnails] = useState(3);
+
+  // Responsive thumbnail count
   useEffect(() => {
-    const videoList = videoListRef.current!;
-    const scrollBarThumb = scrollBarThumbRef.current!;
-    const sliderScrollBar = scrollBarRef.current!;
-    const maxScrollLeft = videoList.scrollWidth - videoList.clientWidth;
-
-    const handleMouseDown = (e: MouseEvent) => {
-      const startX = e.clientX;
-      const thumbPosition = scrollBarThumb.offsetLeft;
-
-      const handleMouseMove = (e: MouseEvent) => {
-        const deltaX = e.clientX - startX;
-        const newThumbPosition = thumbPosition + deltaX;
-        const maxThumbPosition = sliderScrollBar.clientWidth - scrollBarThumb.offsetWidth;
-        const boundedPosition = Math.max(0, Math.min(maxThumbPosition, newThumbPosition));
-        const scrollPosition = (boundedPosition / maxThumbPosition) * maxScrollLeft;
-
-        scrollBarThumb.style.left = `${boundedPosition}px`;
-        videoList.scrollLeft = scrollPosition;
-      };
-
-      const handleMouseUp = () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-    };
-      // hello
-    scrollBarThumb.addEventListener("mousedown", handleMouseDown);
-
-    const handleSlideButtons = () => {
-      if (prevButtonRef.current && nextButtonRef.current) {
-        prevButtonRef.current.style.display = videoList.scrollLeft <= 0 ? "none" : "block";
-        nextButtonRef.current.style.display = videoList.scrollLeft >= maxScrollLeft ? "none" : "block";
+    const updateVisibleThumbnails = () => {
+      if (window.innerWidth < 640) { // sm breakpoint
+        setVisibleThumbnails(1);
+      } else if (window.innerWidth < 768) { // md breakpoint
+        setVisibleThumbnails(2);
+      } else {
+        setVisibleThumbnails(3);
       }
     };
 
-    const updateScrollThumbPosition = () => {
-      const scrollPosition = videoList.scrollLeft;
-      const thumbPosition = (scrollPosition / maxScrollLeft) * (sliderScrollBar.clientWidth - scrollBarThumb.offsetWidth);
-      scrollBarThumb.style.left = `${thumbPosition}px`;
-    };
-
-    const handleScroll = () => {
-      handleSlideButtons();
-      updateScrollThumbPosition();
-    };
-
-    videoList.addEventListener("scroll", handleScroll);
-    handleSlideButtons();
-
-    return () => {
-      scrollBarThumb.removeEventListener("mousedown", handleMouseDown);
-      videoList.removeEventListener("scroll", handleScroll);
-    };
+    updateVisibleThumbnails();
+    window.addEventListener('resize', updateVisibleThumbnails);
+    return () => window.removeEventListener('resize', updateVisibleThumbnails);
   }, []);
 
-  const handleSlide = (direction: "prev" | "next") => {
-    const videoList = videoListRef.current!;
-    const scrollAmount = videoList.clientWidth * (direction === "prev" ? -1 : 1);
-    videoList.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  // Touch handlers for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const videos = [
-    "https://www.youtube.com/embed/fv-EGsNvNzc",
-  "https://www.youtube.com/embed/mXqlpP0gnaY",
-  "https://www.youtube.com/embed/Q0rOKZZ7Nas",
-  "https://www.youtube.com/embed/oxEoLkEMpnE",
-  "https://www.youtube.com/embed/Hkfxki3ywaU",
-  "https://www.youtube.com/embed/2yxa67n5JR4",
-  "https://www.youtube.com/embed/8_2LWMBs_Dw",
-  "https://www.youtube.com/embed/Qi-7ns4BfgM",
-  "https://www.youtube.com/embed/T0GGyYpnNmE",
-  "https://www.youtube.com/embed/aiWiA_zPDOk"
-  ];
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      handleNext();
+    }
+    if (isRightSwipe) {
+      handlePrev();
+    }
+  };
+
+  const handlePrev = () => setStartIndex(Math.max(0, startIndex - 1));
+  const handleNext = () => setStartIndex(Math.min(videos.length - visibleThumbnails, startIndex + 1));
+  const handleThumbnailClick = (video: Video) => setMainVideo(video);
+
+  // Calculate thumbnail width and gap based on screen size
+  const getThumbnailDimensions = () => {
+    if (visibleThumbnails === 1) {
+      return { width: 'w-64 sm:w-72', height: 'h-36 sm:h-40', gap: 'gap-4' };
+    } else if (visibleThumbnails === 2) {
+      return { width: 'w-40', height: 'h-24', gap: 'gap-3' };
+    } else {
+      return { width: 'w-32 lg:w-48', height: 'h-20 lg:h-28', gap: 'gap-2 lg:gap-4' };
+    }
+  };
+
+  const dimensions = getThumbnailDimensions();
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Personalized Dental Tips</h2>
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+      <h2 className="text-2xl sm:text-3xl font-bold text-sky-400 mb-4 sm:mb-6 text-center">
+        Personalized Dental Tips
+      </h2>
 
-      <div style={styles.sliderWrapper}>
-        <button
-          onClick={() => handleSlide("prev")}
-          ref={prevButtonRef}
-          style={{ ...styles.slideButton, left: "0" }}
+      {/* Main Video Player */}
+      <div className="relative mb-4 sm:mb-6">
+        <div className="relative mx-auto w-full max-w-4xl">
+          <iframe
+            src={`https://www.youtube.com/embed/${mainVideo.id}`}
+            title="Main Video"
+            className="w-full h-56 sm:h-72 md:h-80 lg:h-96 rounded-xl sm:rounded-2xl shadow-lg transition-all duration-500 ease-in-out"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          />
+        </div>
+      </div>
+
+      {/* Thumbnail Navigation */}
+      <div className="relative flex items-center justify-center">
+        {/* Previous Button - Hidden on mobile when showing 1 thumbnail */}
+        <button 
+          onClick={handlePrev}
+          disabled={startIndex === 0}
+          className={`absolute left-0 sm:left-2 z-10 p-1 sm:p-2 rounded-full transition-all duration-200 ${
+            startIndex === 0 
+              ? 'text-gray-400 cursor-not-allowed' 
+              : 'text-sky-400 hover:text-sky-600 hover:bg-sky-50'
+          } ${visibleThumbnails === 1 ? 'hidden sm:block' : ''}`}
         >
-          ◀
+          <ChevronLeft size={visibleThumbnails === 1 ? 24 : 28} />
         </button>
 
-        <div style={styles.videoList} ref={videoListRef}>
-          {videos.map((src, index) => (
-            <iframe
-              key={index}
-              style={styles.videoItem}
-              src={src}
-              title={`YouTube video ${index + 1}`}
-              frameBorder="0"
-              allowFullScreen
-            />
-          ))}
+        {/* Thumbnails Container */}
+        <div 
+          className={`${visibleThumbnails === 1 ? 'mx-0' : 'mx-8 sm:mx-12 lg:mx-16'} overflow-hidden touch-pan-y`}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div 
+            className={`flex ${dimensions.gap} transition-transform duration-500 ease-in-out justify-center sm:justify-start`}
+            style={{ 
+              transform: `translateX(-${startIndex * (100 / visibleThumbnails)}%)`,
+            }}
+          >
+            {videos.map((video) => (
+              <div
+                key={video.id}
+                onClick={() => handleThumbnailClick(video)}
+                className={`relative cursor-pointer group transition-all duration-200 flex-shrink-0 ${
+                  mainVideo.id === video.id 
+                    ? 'ring-2 sm:ring-4 ring-violet-400 rounded-lg sm:rounded-xl' 
+                    : 'hover:ring-2 hover:ring-sky-300 rounded-lg sm:rounded-xl'
+                }`}
+                style={{
+                  width: visibleThumbnails === 1 ? '100%' : `calc(${100 / visibleThumbnails}% - ${visibleThumbnails === 3 ? '0.5rem' : '0.75rem'})`
+                }}
+              >
+                <div className="relative overflow-hidden rounded-lg sm:rounded-xl">
+                  <img
+                    src={video.thumbnail}
+                    alt="Video thumbnail"
+                    className={`${dimensions.width} ${dimensions.height} w-full object-cover transition-transform duration-200 group-hover:scale-105`}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <Play className="text-white" size={visibleThumbnails === 1 ? 32 : 20} fill="white" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <button
-          onClick={() => handleSlide("next")}
-          ref={nextButtonRef}
-          style={{ ...styles.slideButton, right: "0" }}
+        {/* Next Button - Hidden on mobile when showing 1 thumbnail */}
+        <button 
+          onClick={handleNext}
+          disabled={startIndex >= videos.length - visibleThumbnails}
+          className={`absolute right-0 sm:right-2 z-10 p-1 sm:p-2 rounded-full transition-all duration-200 ${
+            startIndex >= videos.length - visibleThumbnails
+              ? 'text-gray-400 cursor-not-allowed' 
+              : 'text-sky-400 hover:text-sky-600 hover:bg-sky-50'
+          } ${visibleThumbnails === 1 ? 'hidden sm:block' : ''}`}
         >
-          ▶
+          <ChevronRight size={visibleThumbnails === 1 ? 24 : 28} />
         </button>
       </div>
 
-      <div style={styles.sliderScrollbar} ref={scrollBarRef}>
-        <div style={styles.scrollbarTrack}>
-          <div style={styles.scrollbarThumb} ref={scrollBarThumbRef}></div>
-        </div>
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-4 sm:mt-6 gap-2">
+        {Array.from({ length: videos.length - visibleThumbnails + 1 }).map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setStartIndex(idx)}
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-200 ${
+              startIndex === idx 
+                ? 'bg-sky-400' 
+                : 'bg-gray-300 hover:bg-sky-200'
+            }`}
+          />
+        ))}
       </div>
+
+      {/* Mobile Swipe Hint */}
+      {visibleThumbnails === 1 && (
+        <p className="text-center text-xs text-gray-500 mt-2 sm:hidden">
+          Swipe left or right to browse videos
+        </p>
+      )}
     </div>
   );
 };
 
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    maxWidth: "1200px",
-    width: "95%",
-    margin: "auto",
-    fontFamily: "'Segoe UI', Roboto, sans-serif",
-    background: "linear-gradient(135deg, #6eb5ff 0%, #4a90e2 50%, #357abd 100%)",
-    borderRadius: "24px",
-    padding: "30px",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-    minHeight: "400px",
-  },
-  heading: {
-    fontSize: "1.8rem",
-    fontWeight: 600,
-    marginBottom: "1.5rem",
-    textAlign: "center",
-    color: "white",
-    textShadow: "0 2px 4px rgba(0,0,0,0.2)",
-  },
-  sliderWrapper: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: "16px",
-    padding: "10px",
-    backdropFilter: "blur(10px)",
-  },
-  videoList: {
-    display: "flex",
-    overflowX: "scroll",
-    scrollBehavior: "smooth",
-    scrollbarWidth: "none" as any,
-    msOverflowStyle: "none",
-    width: "100%",
-    padding: "10px 0",
-  },
-  videoItem: {
-    minWidth: "320px",
-    height: "180px",
-    marginRight: "10px",
-    borderRadius: "12px",
-    pointerEvents: "auto",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-  },
-  slideButton: {
-    position: "absolute",
-    zIndex: 2,
-    fontSize: "1.5rem",
-    padding: "10px 16px",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    border: "none",
-    cursor: "pointer",
-    top: "50%",
-    transform: "translateY(-50%)",
-    boxShadow: "0px 4px 12px rgba(0,0,0,0.2)",
-    borderRadius: "50%",
-    fontWeight: "bold",
-    color: "#357abd",
-    transition: "all 0.3s ease",
-  },
-  sliderScrollbar: {
-    height: "20px",
-    marginTop: "15px",
-  },
-  scrollbarTrack: {
-    height: "6px",
-    backgroundColor: "rgba(255,255,255,0.3)",
-    borderRadius: "6px",
-    position: "relative",
-  },
-  scrollbarThumb: {
-    height: "100%",
-    width: "60px",
-    backgroundColor: "rgba(255,255,255,0.8)",
-    borderRadius: "6px",
-    position: "absolute",
-    left: "0",
-    cursor: "grab",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-  },
-};
-
-export default YouTubeSlider;
+export default YoutubeSlider;
