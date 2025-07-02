@@ -76,7 +76,15 @@
 ---
 
 ## 📷 Screenshots
+![Image](https://github.com/user-attachments/assets/a1124ad0-fb6d-4329-8037-d3a401b5a150)
 
+![Image](https://github.com/user-attachments/assets/6f6bfff0-420c-43d6-964a-af446fae5d3d)
+
+![Image](https://github.com/user-attachments/assets/9446a245-b18d-4cae-a844-af51e4ce02ef)
+
+![Image](https://github.com/user-attachments/assets/b63bf143-d38b-4921-9940-8ca3b3d1a65d)
+
+![Image](https://github.com/user-attachments/assets/b9487a03-152b-458e-970b-ef85e8f69930)
 
 DentalLens is designed to make oral health care more accessible — especially for communities without regular access to dental services. 🦷💙
 
