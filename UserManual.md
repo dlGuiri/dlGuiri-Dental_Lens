@@ -4,17 +4,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Features](#features)
-- [How It Works](#how-it-works)
-- [How to Use](#how-to-use)
-- [Tips for Better Scans](#tips-for-better-scans)
-- [Data Privacy](#data-privacy)
-- [Planned Improvements](#planned-improvements)
-
----
-
 ## ✅ Features
 
 - 📷 **Image Upload**: Upload mouth photos for instant analysis.
