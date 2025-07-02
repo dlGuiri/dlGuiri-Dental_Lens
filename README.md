@@ -19,7 +19,7 @@
 ---
 
 ## 📗 User Manual 
-
+[USER MANUAL.md](./UserManual.md)
 
 ---
 Thank you for checking out our repository! Feel free to explore.
