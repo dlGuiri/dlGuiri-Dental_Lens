@@ -1,3 +1,6 @@
+# School Portfolio
+I am Darwin Louis M. Guirigay, a 2nd year at MMCM in the CCIS BS CS course. I’ve always been passionate about technology and problem-solving, and studying computer science has allowed me to dive into areas like programming, software development, and data structures.
+
 # 🦷 Welcome to DentalLens
 
 <p align="center">
