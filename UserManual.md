@@ -1,4 +1,4 @@
-# 🦷 DentalLens User Manual
+# 🦷 Dental Lens User Manual
 
 **DentalLens** is a web-based application that allows users to perform AI-assisted oral health assessments by uploading a photo of their mouth. The system uses machine learning to detect common dental issues and provide personalized health tips.
 
