@@ -541,9 +541,9 @@ const ScanPage = () => {
       const fastData = await fastResponse.json();
 
       // Extract prediction from fast response
-      const prediction = fastData.prediction.hybrid_prediction;
+      const prediction = fastData.prediction.prediction;
       setPredictionResult(prediction);
-      setConfidenceLevel(`${(fastData.prediction.hybrid_confidence * 100).toFixed(1)}%`);
+      setConfidenceLevel(`${(fastData.prediction.confidence * 100).toFixed(1)}%`);
       console.log("Fast prediction received:", prediction);
 
       setLoading(false);
@@ -574,12 +574,7 @@ const ScanPage = () => {
 
             // Prepare comprehensive notes array
             const notes = [
-              `CNN Prediction: ${fastData.prediction.cnn_prediction} (${(fastData.prediction.cnn_confidence * 100).toFixed(1)}% confidence)`,
-              `Hybrid Prediction: ${fastData.prediction.hybrid_prediction} (${(fastData.prediction.hybrid_confidence * 100).toFixed(1)}% confidence)`,
-              `Total Positive Evidence: ${limeData.lime_statistics.total_positive_evidence.toFixed(4)}`,
-              `Total Negative Evidence: ${limeData.lime_statistics.total_negative_evidence.toFixed(4)}`,
-              `Net Evidence: ${limeData.lime_statistics.net_evidence.toFixed(4)}`,
-              ...limeData.lime_statistics.clinical_interpretation,
+              `Model Prediction: ${fastData.prediction.prediction} (${(fastData.prediction.confidence * 100).toFixed(1)}% confidence)`,
             ];
 
             // Save to database with LIME data
