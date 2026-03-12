@@ -1,12 +1,10 @@
 # main_api.py
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-# from prediction import predict_disease  <-- Verify if you still need this
 from pydantic import BaseModel
 from chatbot import stream_response
-from typing import List
-import tracebackc
+import traceback  # ← was "tracebackc" (typo — this was crashing every error handler)
 import logging
 
 # Import LIME functionality
@@ -36,13 +34,12 @@ async def predict_fast_endpoint(file: UploadFile = File(...)):
         image_bytes = await file.read()
         predictor = get_lime_predictor()
         result = predictor.predict(image_bytes)
-        
-        # Changed from hybrid_prediction to just prediction
+
         logger.info(f"Fast prediction successful: {result['prediction']}")
-        
+
         return JSONResponse(content={
             "status": "success",
-            "prediction": result
+            "prediction": result  # result must contain 'prediction' and 'confidence' keys
         })
     except Exception as e:
         logger.error(f"Error in predict_fast_endpoint: {str(e)}")
@@ -56,21 +53,21 @@ async def generate_lime_endpoint(file: UploadFile = File(...), num_samples: int 
     try:
         if not 100 <= num_samples <= 1000:
             raise HTTPException(status_code=400, detail="num_samples must be between 100 and 1000")
-        
+
         logger.info(f"LIME generation - File: {file.filename}, Samples: {num_samples}")
         image_bytes = await file.read()
         predictor = get_lime_predictor()
         result = predictor.predict_with_lime(image_bytes, num_samples=num_samples)
-        
-        logger.info(f"LIME explanation generated successfully")
-        
+
+        logger.info("LIME explanation generated successfully")
+
         return JSONResponse(content={
             "status": "success",
             "explanation_image": result['explanation_image'],
             "lime_statistics": result['lime_statistics'],
             "num_samples": result['num_samples']
         })
-    
+
     except HTTPException:
         raise
     except Exception as e:
@@ -85,19 +82,18 @@ async def predict_with_lime_endpoint(file: UploadFile = File(...), num_samples: 
     try:
         if not 100 <= num_samples <= 1000:
             raise HTTPException(status_code=400, detail="num_samples must be between 100 and 1000")
-        
+
         logger.info(f"LIME with Explanation - File: {file.filename}, Samples: {num_samples}")
         image_bytes = await file.read()
         predictor = get_lime_predictor()
         result = predictor.predict_with_lime(image_bytes, num_samples=num_samples)
-        
-        # Updated to reference new dictionary key
+
         logger.info(f"LIME explanation generated for: {result['prediction']['prediction']}")
         return JSONResponse(content={
             "status": "success",
             **result
         })
-    
+
     except HTTPException:
         raise
     except Exception as e:
@@ -130,9 +126,9 @@ async def lime_health_check():
         return {
             "status": "healthy",
             "model_loaded": True,
-            "model_type": "DentalLens_V6 (ConvNeXt + Swin)",
+            "model_type": "TongueLens (ConvNeXt + Swin Transformer)",
             "num_classes": len(predictor.classes),
-            "disease_classes": predictor.classes
+            "tongue_classes": predictor.classes  # renamed from disease_classes
         }
     except Exception as e:
         logger.error(f"LIME health check failed: {str(e)}")
@@ -141,10 +137,10 @@ async def lime_health_check():
 @app.get("/")
 async def root():
     return {
-        "message": "Dental Disease Detection API - DentalLens V6",
+        "message": "Tongue Disease Detection API",
         "endpoints": {
             "prediction": {
-                "/predict-fast": "Fast prediction (PyTorch, no LIME) ⚡",
+                "/predict-fast": "Fast prediction (no LIME) ⚡",
                 "/generate-lime": "Generate LIME explanation separately 🔍",
                 "/predict-with-lime": "Complete prediction with LIME (slower) 📊"
             },
@@ -152,11 +148,12 @@ async def root():
                 "/chat-stream": "Streaming chatbot responses"
             },
             "health": {
-                "/lime/health": "Check model status"
+                "/lime/health": "Check model status",
+                "/health": "General health check"
             }
         }
     }
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "dental-api", "model": "DentalLens_V6"}
+    return {"status": "healthy", "service": "tongue-api", "model": "TongueLens_V1"}
