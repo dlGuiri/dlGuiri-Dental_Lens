@@ -609,32 +609,28 @@ const ScanPage = () => {
 
   return (
     <>
-      <div className="h-[370px] bg-gradient-to-br from-[#4fa1f2] via-[#74b0f0] to-[#66acf4] 
-        backdrop-blur-md bg-opacity-30 rounded-3xl p-6 shadow-md hover:shadow-blue-300 
+      {/* Results panel */}
+      <div className="h-[370px] bg-gradient-to-tr from-[#6a8ff7] via-[#7eb8f7] to-[#b2ede8]
+        backdrop-blur-md bg-opacity-30 rounded-3xl p-6 shadow-md hover:shadow-blue-300
         transition-shadow duration-500 relative"
-      >       
-        {/* Loading GIF overlay */}
+      >
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center pt-4 rounded-3xl z-10">
-            <img 
-              src={LoadingTeeth.src} 
-              alt="Loading..." 
-              className="w-40 h-auto" // Adjust size as needed
-            />
+            <img src={LoadingTeeth.src} alt="Loading..." className="w-40 h-auto" />
           </div>
         )}
+ 
         <div className="flex justify-between">
-          <h2 className="text-2xl font-bold text-white">Ready to check your Teeth's Health?</h2>
-          {/* Show loading state while generating LIME */}
+          <h2 className="text-2xl font-bold text-white">Ready to check your Tongue's Health?</h2>
+ 
           {generatingLime && (
             <div className="flex items-center gap-3 px-4 py-2 bg-blue-500/80 rounded-3xl">
               <span className="text-white text-sm font-medium">
-                Please wait for 30 seconds, Image Explanation Generating...
+                Generating AI Explanation, please wait...
               </span>
             </div>
           )}
-
-          {/* Show button when LIME is ready */}
+ 
           {!generatingLime && limeExplanation && (
             <button
               onClick={() => setShowLimeExplanation(true)}
@@ -643,201 +639,135 @@ const ScanPage = () => {
               🔍 View AI Explanation
             </button>
           )}
-        </div>     
+        </div>
+ 
         <p className="text-2xl text-white font-semibold mt-2">Scan Results</p>
+ 
         {predictionResult !== "" ? (
           isValid ? (
             <div className="flex items-start gap-10 mt-4">
-              {/* Prediction list on the left */}
+              {/* Condition result */}
               <div className="text-xl text-white">
-                <p className="mb-2 font-semibold">Diseases Present:</p>
+                <p className="mb-2 font-semibold">Tongue Condition:</p>
                 <ul className="list-disc list-inside">
-                  {predictionResult ? (
-                    <>
-                      <li className="font-semibold capitalize">{predictionResult}</li>
-                      <li>Confidence: {confidenceLevel}</li>
-                    </>
-                  ) : (
-                    <li>{predictionResult}</li>
-                  )}
+                  <li className="font-semibold capitalize">{predictionResult}</li>
+                  <li>Confidence: {confidenceLevel}</li>
                 </ul>
               </div>
-
-              {/* Status boxes */}
+ 
+              {/* Info boxes */}
               <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
-                <p className="text-sm font-medium mb-2">Severity of Disease:</p>
-                <p className="text-sm">{severityResponses}</p>
+                <p className="text-sm font-medium mb-2">Severity:</p>
+                <p className="text-sm">{severityResponses || "—"}</p>
               </div>
               <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
                 <p className="text-sm font-medium mb-2">Possible Causes:</p>
-                <p className="text-sm">{causeResponses}</p>
+                <p className="text-sm">{causeResponses || "—"}</p>
               </div>
               <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
                 <p className="text-sm font-medium mb-2">Symptoms:</p>
-                <p className="text-sm">{symptomResponses}</p>
+                <p className="text-sm">{symptomResponses || "—"}</p>
               </div>
             </div>
           ) : (
-            <p className="mt-4 text-2xl text-white font-semibold">
-              {predictionResult}
-            </p>
+            <p className="mt-4 text-2xl text-white font-semibold">{predictionResult}</p>
           )
         ) : null}
       </div>
-
+ 
+      {/* Upload panel */}
       <div className="h-[370px] bg-gradient-to-br from-white via-[#f0f0f0] to-[#e6e6e6]
         backdrop-blur-md bg-opacity-50 rounded-3xl p-6 shadow-md hover:shadow-gray-300
         transition-shadow duration-500 relative"
-      >     
-        <div className="flex justify-between items-center mb-4">  
-          <h2 className="text-2xl font-bold text-[#74b0f0]">Upload Images Here:</h2>
-          
-          {/* Camera controls on the right */}
-          <div className="flex gap-2 items-center flex-wrap">          
-            {/* Device selector dropdown */}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-[#74b0f0]">Upload Tongue Image:</h2>
+ 
+          <div className="flex gap-2 items-center flex-wrap">
             {availableDevices.length > 1 && !isCameraOpen && (
               <select
                 value={selectedDeviceId}
-                onChange={(e) => setSelectedDeviceId(e.target.value)}
+                onChange={e => setSelectedDeviceId(e.target.value)}
                 className="px-3 py-2 rounded-3xl border border-gray-300 text-sm max-w-48"
               >
                 <option value="">Select Camera</option>
-                {availableDevices.map((device, index) => (
-                  <option key={device.deviceId} value={device.deviceId}>
-                    {device.label || `Camera ${index + 1}`}
-                  </option>
+                {availableDevices.map((d, i) => (
+                  <option key={d.deviceId} value={d.deviceId}>{d.label || `Camera ${i + 1}`}</option>
                 ))}
               </select>
             )}
-            
+ 
             {!isCameraOpen ? (
-              <button
-                onClick={openCamera}
-                className="px-4 py-2 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition"
-              >
+              <button onClick={openCamera} className="px-4 py-2 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition">
                 📷 Open Camera
               </button>
             ) : (
-              <button
-                onClick={closeCamera}
-                className="px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 transition"
-              >
+              <button onClick={closeCamera} className="px-4 py-2 bg-red-500 text-white rounded-3xl hover:bg-red-600 transition">
                 ✕ Close Camera
               </button>
             )}
           </div>
-
-          {/* Device selector modal */}
+ 
           {showDeviceSelector && (
             <div className="absolute top-20 right-6 z-20 bg-white p-4 rounded-xl shadow-lg border max-w-80">
               <p className="text-gray-800 mb-3 font-medium">Select Camera:</p>
               <div className="space-y-2 max-h-40 overflow-y-auto">
-                {availableDevices.map((device, index) => (
-                  <button
-                    key={device.deviceId}
-                    onClick={() => selectAndOpenCamera(device.deviceId)}
-                    className="block w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-sm border"
-                  >
-                    <div className="font-medium">
-                      {device.label || `Camera ${index + 1}`}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate">
-                      ID: {device.deviceId.substring(0, 30)}...
-                    </div>
+                {availableDevices.map((d, i) => (
+                  <button key={d.deviceId} onClick={() => selectAndOpenCamera(d.deviceId)}
+                    className="block w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition text-sm border">
+                    <div className="font-medium">{d.label || `Camera ${i + 1}`}</div>
+                    <div className="text-xs text-gray-500 truncate">ID: {d.deviceId.substring(0, 30)}...</div>
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setShowDeviceSelector(false)}
-                className="mt-3 px-3 py-1 bg-gray-500 text-white rounded-lg text-sm"
-              >
-                Cancel
-              </button>
+              <button onClick={() => setShowDeviceSelector(false)} className="mt-3 px-3 py-1 bg-gray-500 text-white rounded-lg text-sm">Cancel</button>
             </div>
           )}
         </div>
-
-        {/* Camera view - Absolute positioned to not affect layout */}
+ 
         {isCameraOpen && (
           <div className="absolute top-20 right-6 z-10">
             <p className="text-gray-600 mb-2 text-sm">Camera View:</p>
             <div className="relative">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
+              <video ref={videoRef} autoPlay playsInline muted
                 className="w-48 h-36 rounded-xl shadow-md bg-black object-cover"
-                onLoadedMetadata={() => {
-                  if (videoRef.current) {
-                    videoRef.current.play();
-                  }
-                }}
+                onLoadedMetadata={() => videoRef.current?.play()}
               />
-              <button
-                onClick={capturePhoto}
-                className="mt-2 px-3 py-1 bg-[#74b0f0] text-white text-sm rounded-3xl hover:bg-[#5a9bd8] transition block"
-              >
+              <button onClick={capturePhoto}
+                className="mt-2 px-3 py-1 bg-[#74b0f0] text-white text-sm rounded-3xl hover:bg-[#5a9bd8] transition block">
                 📸 Capture Photo
               </button>
             </div>
           </div>
         )}
-
-        {/* Main content area with fixed height */}
+ 
         <div className="flex gap-4 h-[calc(100%-120px)]">
-          {/* Left side - Upload and preview */}
           <div className="flex-1">
             <div className="mb-4">
-              <label 
-                htmlFor="fileUpload" 
-                className="cursor-pointer px-4 py-2 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition inline-block"
-              >
+              <label htmlFor="fileUpload"
+                className="cursor-pointer px-4 py-2 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition inline-block">
                 Choose Image
               </label>
-              <input 
-                id="fileUpload"
-                type="file" 
-                accept="image/*" 
-                multiple
-                onChange={handleImageUpload} 
-                className="hidden"
-              />
+              <input id="fileUpload" type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
             </div>
-
-            {/* Replace the single image preview with: */}
+ 
             {images.length > 0 && (
               <div className="overflow-hidden">
                 <div className="flex justify-between items-center mb-2">
                   <p className="text-gray-600">Image Preview ({images.length}/{MAX_IMAGES}):</p>
-                  <button
-                    onClick={() => {
-                      setImages([]);
-                      setSelectedFiles([]);
-                    }}
-                    className="text-[#4fa1f2] text-sm hover:text-blue-700"
-                  >
-                    Clear All
-                  </button>
+                  <button onClick={() => { setImages([]); setSelectedFiles([]); }} className="text-[#4fa1f2] text-sm hover:text-blue-700">Clear All</button>
                 </div>
                 <div className="flex flex-wrap gap-6 max-h-[180px] overflow-y-auto justify-center">
                   {images.map((img, index) => (
                     <div key={index} className="relative">
-                      <img 
-                        src={img} 
-                        alt={`Preview ${index + 1}`} 
-                        className="w-[150px] h-[150px] object-cover rounded-xl shadow-md"
-                      />
+                      <img src={img} alt={`Preview ${index + 1}`} className="w-[150px] h-[150px] object-cover rounded-xl shadow-md" />
                       <button
                         onClick={() => {
                           setImages(prev => prev.filter((_, i) => i !== index));
                           setSelectedFiles(prev => prev.filter((_, i) => i !== index));
                         }}
                         className="absolute -top-1 right-0 bg-red-400 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                      
+                      >×</button>
                     </div>
                   ))}
                 </div>
@@ -845,68 +775,39 @@ const ScanPage = () => {
             )}
           </div>
         </div>
-
-        {/* Fixed position button at bottom center */}
+ 
         <div className="absolute bottom-6 right-6">
-          <button 
-            onClick={handleSubmit}
-            disabled={loading || selectedFiles.length === 0}
-            className="px-6 py-3 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition disabled:opacity-50 font-medium"
-          >
+          <button onClick={handleSubmit} disabled={loading || selectedFiles.length === 0}
+            className="px-6 py-3 bg-[#74b0f0] text-white rounded-3xl hover:bg-[#5a9bd8] transition disabled:opacity-50 font-medium">
             {loading ? "Analyzing..." : "Analyze Image"}
           </button>
         </div>
-
-        {/* Hidden canvas for photo capture */}
+ 
         <canvas ref={canvasRef} style={{ display: 'none' }} />
       </div>
-
-      {/* LIME Explanation Modal */}
+ 
+      {/* LIME Modal */}
       {showLimeExplanation && limeExplanation && (
-        <div 
-          className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-2xl bg-opacity-50"
-          onClick={() => setShowLimeExplanation(false)}
-        >
-          <div 
-            className="bg-white rounded-3xl p-6 max-w-6xl max-h-[95vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 backdrop-blur-2xl bg-opacity-50"
+          onClick={() => setShowLimeExplanation(false)}>
+          <div className="bg-white rounded-3xl p-6 max-w-6xl max-h-[95vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-2xl font-bold text-gray-800">
-                🔍 AI Explanation - LIME Analysis
-              </h3>
-              <button
-                onClick={() => setShowLimeExplanation(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ×
-              </button>
+              <h3 className="text-2xl font-bold text-gray-800">🔍 AI Explanation - LIME Analysis</h3>
+              <button onClick={() => setShowLimeExplanation(false)} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
             </div>
-
             <div className="mb-2 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-700">
-                <strong>How to read:</strong>
-              </p>
+              <p className="text-sm text-gray-700"><strong>How to read:</strong></p>
               <ul className="text-sm text-gray-600 mt-2 space-y-1">
-                <li>🟢 Green regions = Areas supporting the diagnosis</li>
+                <li>🟢 Green regions = Areas supporting the tongue condition diagnosis</li>
                 <li>🔴 Red regions = Areas contradicting the diagnosis</li>
                 <li>⚪ Neutral areas = Not significant for diagnosis</li>
               </ul>
             </div>
-
-            <img
-              src={`data:image/png;base64,${limeExplanation}`}
-              alt="LIME Explanation"
-              className="w-full rounded-lg shadow-lg"
-            />
-
+            <img src={`data:image/png;base64,${limeExplanation}`} alt="LIME Explanation" className="w-full rounded-lg shadow-lg" />
             <div className="mt-4 text-center">
-              <button
-                onClick={() => setShowLimeExplanation(false)}
-                className="px-6 py-2 bg-gray-600 text-white rounded-3xl hover:bg-gray-700 transition"
-              >
-                Close
-              </button>
+              <button onClick={() => setShowLimeExplanation(false)}
+                className="px-6 py-2 bg-gray-600 text-white rounded-3xl hover:bg-gray-700 transition">Close</button>
             </div>
           </div>
         </div>
@@ -914,5 +815,5 @@ const ScanPage = () => {
     </>
   );
 };
-
+ 
 export default ScanPage;

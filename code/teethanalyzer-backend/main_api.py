@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from chatbot import stream_response
 from typing import List
-import tracebackc
+import traceback
 import logging
 
 # Import LIME functionality
