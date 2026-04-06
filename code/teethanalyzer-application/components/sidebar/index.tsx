@@ -23,6 +23,17 @@ const Sidebar = (): JSX.Element => {
                 <HomeIcon isActive={pathname === "/"} />
                 <br />
                 <ScanIcon isActive={pathname === "/scan"} /> 
+<<<<<<< HEAD
+                
+                {/*<br />
+                <TipsIcon isActive={pathname === "/recommended"} />*
+                <br />/}
+                {/* <DentistIcon isActive={pathname === "/ChatPagePatient"} />
+                <br /> */}
+                {/* <ChatbotIcon isActive={pathname === "/chatbot"} /> */}
+                {/*<br />
+                <GoalsIcon isActive={pathname === "/calendar"} />*/}
+=======
                 <br />
                 <TipsIcon isActive={pathname === "/recommended"} />
                 <br />
@@ -31,6 +42,7 @@ const Sidebar = (): JSX.Element => {
                 {/* <ChatbotIcon isActive={pathname === "/chatbot"} /> */}
                 <br />
                 <GoalsIcon isActive={pathname === "/calendar"} />
+>>>>>>> 213da0601e3090184f4f0c6350c299b67eaec917
                 <SettingsIcon isActive={pathname === "/login"} />
             </div>
         </aside>
