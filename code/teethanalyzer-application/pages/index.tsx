@@ -15,11 +15,14 @@ const HomePage = () => {
 
       {/* Modified to only use HomeCard1 */}
       <HomeCard1 className="md:col-span-15 md:row-span-15"/>
+      {/* 
       <HomeCard1 className="md:col-span-9 md:row-span-10" />
       <HomeCard2 className="md:col-span-3 md:row-span-10" />
       <HomeCard3 className="md:col-span-6 md:row-span-8" />
       <HomeCard4 className="md:col-span-3 md:row-span-8" />
       <HomeCard5 className="md:col-span-3 md:row-span-8" />
+      */}
+      
       
 
     </div>
