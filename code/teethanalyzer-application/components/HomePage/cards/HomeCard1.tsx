@@ -158,17 +158,8 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
   let recommendedAction = "Please consult a doctor about your tongue condition.";
   if (displayResult?.toLowerCase() === "no disease detected") {
     displayResult = "None";
-    recommendedAction = "Tongue appears healthy. Maintain good oral hygiene!";
+    recommendedAction = "Tongue appears healthy. Maintain current healthy lifestyle";
   }
-
-  // ── Confidence value drives the radial bar ────────────────────────────────
-  // confidenceScore is 0–100, sourced directly from the scan result via context
-  const confidenceValue = confidenceScore;
-  const confidenceLabel =
-    confidenceValue <= 25 ? "Low Risk"
-    : confidenceValue <= 50 ? "Moderate Risk"
-    : confidenceValue <= 75 ? "High Risk"
-    : "Very High Risk";
 
   // ── Helper: derive health status from the result array ───────────────────
   // Checks the result field (not notes) so it works with the new note format:
@@ -186,6 +177,25 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
   const latestRecord = scanRecords[scanRecords.length - 1];
   const firstRecord  = scanRecords[0];
 
+  // Format Confidence Score
+  const parseConfidenceFromNotes = (notes: string[]): number => {
+    if (!notes?.length) return 0;
+    const match = notes[0]?.match(/\((\d+(\.\d+)?)%\s*confidence\)/i);
+    return match ? parseFloat(match[1]) : 0;
+  };
+  
+  // ── Confidence value drives the radial bar ────────────────────────────────
+  // confidenceScore is 0–100, sourced directly from the scan result via context
+  const confidenceValue = confidenceScore > 0
+    ? confidenceScore
+    : parseConfidenceFromNotes(latestRecord?.notes ?? []);
+
+  const confidenceLabel =
+    confidenceValue <= 25 ? "Low Risk"
+    : confidenceValue <= 50 ? "Moderate Risk"
+    : confidenceValue <= 75 ? "High Risk"
+    : "Very High Risk";
+  
   return (
     <div
       className={`bg-gradient-to-tr from-[#6a8ff7] via-[#7eb8f7] to-[#b2ede8]
@@ -265,7 +275,7 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                   Result:{" "}
                   {isHealthyRecord(latestRecord) ? "Healthy tongue" : "Condition detected"}
                 </p>
-                <p className="text-sm mb-1">Conditions Present:</p>
+                <p className="text-sm mb-1">Percentage of Risk:</p>
                 <p className="text-sm mb-4 capitalize">{displayResult}</p>
                 <p className="text-sm font-medium mb-1">Actions to be taken:</p>
                 <p className="text-sm">{recommendedAction}</p>

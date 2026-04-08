@@ -39,7 +39,7 @@ const ScanPage = () => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const MAX_IMAGES = 5;
-  const { predictionResult, setPredictionResult } = usePrediction();
+  const { predictionResult, setPredictionResult, setConfidenceScore } = usePrediction();
   const [loading, setLoading] = useState(false);
   const [createScanRecord] = useMutation(CREATE_SCAN_RECORD);
   const [severityResponses, setSeverityResponses] = useState("");
@@ -488,6 +488,7 @@ const ScanPage = () => {
       const prediction = fastData.prediction.prediction;
       setPredictionResult(prediction);
       setConfidenceLevel(`${(fastData.prediction.confidence * 100).toFixed(1)}%`);
+      setConfidenceScore(parseFloat((fastData.prediction.confidence * 100).toFixed(1)));
       console.log("Fast prediction received:", prediction);
 
       setLoading(false);
@@ -598,20 +599,6 @@ const ScanPage = () => {
                   <li className="font-semibold capitalize">{predictionResult}</li>
                   <li>Confidence: {confidenceLevel}</li>
                 </ul>
-              </div>
-
-              {/* Info boxes */}
-              <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
-                <p className="text-sm font-medium mb-2">Severity:</p>
-                <p className="text-sm">{severityResponses || "—"}</p>
-              </div>
-              <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
-                <p className="text-sm font-medium mb-2">Possible Causes:</p>
-                <p className="text-sm">{causeResponses || "—"}</p>
-              </div>
-              <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white">
-                <p className="text-sm font-medium mb-2">Symptoms:</p>
-                <p className="text-sm">{symptomResponses || "—"}</p>
               </div>
             </div>
           ) : (
