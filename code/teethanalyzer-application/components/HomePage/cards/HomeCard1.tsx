@@ -168,7 +168,7 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
     const r = Array.isArray(record.result)
       ? record.result.join(", ")
       : String(record.result ?? "");
-    return r.toLowerCase().includes("no disease");
+    return r.toLowerCase().includes("no disease") || r.toLowerCase().includes("healthy");
   };
 
   const [showHistory, setShowHistory] = useState(false);
@@ -273,10 +273,22 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                 {/* ✅ Checks result field, not notes */}
                 <p className="text-sm mb-1">
                   Result:{" "}
-                  {isHealthyRecord(latestRecord) ? "Healthy tongue" : "Condition detected"}
+                  {isHealthyRecord(latestRecord)
+                    ? "Healthy Assessment"
+                    : `Signs of ${Array.isArray(latestRecord.result)
+                        ? latestRecord.result.join(", ")
+                        : latestRecord.result} detected`}
                 </p>
                 <p className="text-sm mb-1">Percentage of Risk:</p>
-                <p className="text-sm mb-4 capitalize">{displayResult}</p>
+                <p className="text-sm mb-4">
+                  {(() => {
+                    const fromContext = confidenceScore > 0 ? confidenceScore : null;
+                    const fromNotes = parseConfidenceFromNotes(latestRecord.notes ?? []);
+                    const val = fromContext ?? fromNotes;
+                    return val > 0 ? `${val.toFixed(1)}%` : "N/A";
+                  })()}
+                </p>
+
                 <p className="text-sm font-medium mb-1">Actions to be taken:</p>
                 <p className="text-sm">{recommendedAction}</p>
               </>
