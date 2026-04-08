@@ -219,17 +219,31 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                     year: "numeric", month: "long", day: "numeric",
                   })}
                 </p>
-                {/* ✅ Checks result field, not notes */}
+
                 <p className="text-sm mb-1">
                   Result:{" "}
-                  {isHealthyRecord(firstRecord) ? "Healthy tongue" : "Condition detected"}
+                  {isHealthyRecord(firstRecord)
+                    ? "Healthy Assessment"
+                    : `Signs of ${Array.isArray(firstRecord.result)
+                        ? firstRecord.result.join(", ")
+                        : firstRecord.result} detected`}
                 </p>
-                <p className="text-sm mb-1">Conditions Present:</p>
-                <p className="text-sm mb-3 capitalize">
-                  {Array.isArray(firstRecord.result)
-                    ? firstRecord.result.join(", ")
-                    : firstRecord.result}
+
+                <p className="text-sm mb-1">Percentage of Risk:</p>
+                <p className="text-sm mb-4">
+                  {(() => {
+                    const fromNotes = parseConfidenceFromNotes(firstRecord.notes ?? []);
+                    return fromNotes > 0 ? `${fromNotes.toFixed(1)}%` : "N/A";
+                  })()}
                 </p>
+
+                <p className="text-sm font-medium mb-1">Actions to be taken:</p>
+                <p className="text-sm mb-3">
+                  {isHealthyRecord(firstRecord)
+                    ? "Tongue appears healthy. Maintain current healthy lifestyle"
+                    : "Please consult a doctor about your tongue condition."}
+                </p>
+
                 <div className="flex justify-center">
                   <button
                     className="px-4 py-2 bg-white/30 text-white rounded-3xl hover:bg-[#608cc4]/40 transition-colors duration-200"
