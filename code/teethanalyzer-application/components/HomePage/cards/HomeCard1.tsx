@@ -190,12 +190,19 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
     ? confidenceScore
     : parseConfidenceFromNotes(latestRecord?.notes ?? []);
 
-  const confidenceLabel =
-    confidenceValue <= 25 ? "Low Risk"
+  const isHealthy = displayResult?.toLowerCase() === "none" || 
+                  displayResult?.toLowerCase().includes("no disease");
+
+  const confidenceLabel = isHealthy
+    ? "Healthy"
+    : confidenceValue <= 25 ? "Low Risk"
     : confidenceValue <= 50 ? "Moderate Risk"
     : confidenceValue <= 75 ? "High Risk"
     : "Very High Risk";
-  
+
+  // Pass adjusted value to radial so healthy always shows green
+  const radialValue = isHealthy ? Math.min(confidenceValue, 25) : confidenceValue
+    
   return (
     <div
       className={`bg-gradient-to-tr from-[#6a8ff7] via-[#7eb8f7] to-[#b2ede8]
@@ -219,31 +226,17 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                     year: "numeric", month: "long", day: "numeric",
                   })}
                 </p>
-
+                {/* ✅ Checks result field, not notes */}
                 <p className="text-sm mb-1">
                   Result:{" "}
-                  {isHealthyRecord(firstRecord)
-                    ? "Healthy Assessment"
-                    : `Signs of ${Array.isArray(firstRecord.result)
-                        ? firstRecord.result.join(", ")
-                        : firstRecord.result} detected`}
+                  {isHealthyRecord(firstRecord) ? "Healthy tongue" : "Condition detected"}
                 </p>
-
-                <p className="text-sm mb-1">Percentage of Risk:</p>
-                <p className="text-sm mb-4">
-                  {(() => {
-                    const fromNotes = parseConfidenceFromNotes(firstRecord.notes ?? []);
-                    return fromNotes > 0 ? `${fromNotes.toFixed(1)}%` : "N/A";
-                  })()}
+                <p className="text-sm mb-1">Conditions Present:</p>
+                <p className="text-sm mb-3 capitalize">
+                  {Array.isArray(firstRecord.result)
+                    ? firstRecord.result.join(", ")
+                    : firstRecord.result}
                 </p>
-
-                <p className="text-sm font-medium mb-1">Actions to be taken:</p>
-                <p className="text-sm mb-3">
-                  {isHealthyRecord(firstRecord)
-                    ? "Tongue appears healthy. Maintain current healthy lifestyle"
-                    : "Please consult a doctor about your tongue condition."}
-                </p>
-
                 <div className="flex justify-center">
                   <button
                     className="px-4 py-2 bg-white/30 text-white rounded-3xl hover:bg-[#608cc4]/40 transition-colors duration-200"
@@ -262,7 +255,7 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
           <div className="flex flex-col items-center flex-shrink-0 self-end">
             <div className="flex flex-col items-center px-6 pt-4 pb-2">
               <p className="text-white font-semibold text-base mb-1">Tongue Scan Confidence</p>
-              <RadialConfidence value={confidenceValue} />
+              <RadialConfidence value={radialValue} />
               <p className="text-white/80 text-sm -mt-2 mb-3">{confidenceLabel}</p>
             </div>
             <Link href="/scan">

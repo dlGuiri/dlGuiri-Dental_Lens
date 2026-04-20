@@ -14,7 +14,7 @@ const HomePage = () => {
     <div className="grid grid-cols-1 md:grid-cols-12 gap-3 auto-rows-[30px]">
 
       {/* Modified to only use HomeCard1 */}
-      <HomeCard1 className="md:col-span-15 md:row-span-15"/>
+      <HomeCard1 className="md:col-span-12 md:row-span-18" />
       {/* 
       <HomeCard1 className="md:col-span-9 md:row-span-10" />
       <HomeCard2 className="md:col-span-3 md:row-span-10" />
