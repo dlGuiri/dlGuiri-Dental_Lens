@@ -57,6 +57,28 @@ const ScanPage = () => {
   const [totalNegative, setTotalNegative] = useState<number | null>(null);
   const [netEvidence, setNetEvidence] = useState<number | null>(null);
 
+  const [countdown, setCountdown] = useState(30);
+
+  useEffect(() => {
+    if (!generatingLime) {
+      setCountdown(30); // reset when done
+      return;
+    }
+
+    setCountdown(30);
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [generatingLime]);
+
   const isMediaError = (error: unknown): error is DOMException => {
     return error instanceof DOMException;
   };
@@ -581,6 +603,29 @@ const ScanPage = () => {
         </div>
 
         <p className="text-2xl text-white font-semibold mt-2">Scan Results</p>
+    
+        {/* Countdown timer */}
+        {generatingLime && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-5">
+            <div className="relative flex items-center justify-center w-24 h-24">
+              <svg className="absolute w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="white" strokeOpacity="0.2" strokeWidth="8" />
+                <circle
+                  cx="50" cy="50" r="42" fill="none"
+                  stroke="white" strokeWidth="8"
+                  strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 30)}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000"
+                />
+              </svg>
+              <span className="text-white text-3xl font-bold">{countdown}</span>
+            </div>
+            <p className="text-white text-sm font-medium text-center px-6">
+              Please wait for the button in the top right to activate
+            </p>
+          </div>
+        )}
 
         {/* LOCAL_TEST_MODE badge — visible reminder, remove for production */}
         {LOCAL_TEST_MODE && (
