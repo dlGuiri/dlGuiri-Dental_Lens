@@ -57,15 +57,15 @@ const ScanPage = () => {
   const [totalNegative, setTotalNegative] = useState<number | null>(null);
   const [netEvidence, setNetEvidence] = useState<number | null>(null);
 
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(60);
 
   useEffect(() => {
     if (!generatingLime) {
-      setCountdown(45); // reset when done
+      setCountdown(60); // reset when done
       return;
     }
 
-    setCountdown(45);
+    setCountdown(60);
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -608,7 +608,7 @@ const ScanPage = () => {
                   cx="50" cy="50" r="42" fill="none"
                   stroke="white" strokeWidth="8"
                   strokeDasharray={`${2 * Math.PI * 42}`}
-                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 45)}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 60)}`}
                   strokeLinecap="round"
                   className="transition-all duration-1000"
                 />
@@ -616,7 +616,7 @@ const ScanPage = () => {
               <span className="text-white text-3xl font-bold">{countdown}</span>
             </div>
             <p className="text-white text-sm font-medium text-center px-6">
-              Immediate Risk Assessment will be displayed on the left. 
+              Immediate Risk Assessment will be displayed on the left after a couple of seconds. 
               <br/>
               Please wait for the button in the top right to activate.
             </p>
