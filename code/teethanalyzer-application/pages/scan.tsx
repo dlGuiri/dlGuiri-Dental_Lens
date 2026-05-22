@@ -61,11 +61,11 @@ const ScanPage = () => {
 
   useEffect(() => {
     if (!generatingLime) {
-      setCountdown(30); // reset when done
+      setCountdown(45); // reset when done
       return;
     }
 
-    setCountdown(30);
+    setCountdown(45);
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -575,12 +575,6 @@ const ScanPage = () => {
         backdrop-blur-md bg-opacity-30 rounded-3xl p-6 shadow-md hover:shadow-blue-300
         transition-shadow duration-500 relative"
       >
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center pt-4 rounded-3xl z-10">
-            <img src={LoadingTeeth.src} alt="Loading..." className="w-40 h-auto" />
-          </div>
-        )}
-
         <div className="flex justify-between">
           <h2 className="text-2xl font-bold text-white">Ready to check your Tongue's Health?</h2>
 
@@ -614,7 +608,7 @@ const ScanPage = () => {
                   cx="50" cy="50" r="42" fill="none"
                   stroke="white" strokeWidth="8"
                   strokeDasharray={`${2 * Math.PI * 42}`}
-                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 30)}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 45)}`}
                   strokeLinecap="round"
                   className="transition-all duration-1000"
                 />
@@ -622,7 +616,9 @@ const ScanPage = () => {
               <span className="text-white text-3xl font-bold">{countdown}</span>
             </div>
             <p className="text-white text-sm font-medium text-center px-6">
-              Please wait for the button in the top right to activate
+              Immediate Risk Assessment will be displayed on the left. 
+              <br/>
+              Please wait for the button in the top right to activate.
             </p>
           </div>
         )}
