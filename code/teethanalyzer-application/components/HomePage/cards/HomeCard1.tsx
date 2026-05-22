@@ -27,15 +27,32 @@ type ScanRecord = {
   notes: string[];
 };
 
-const getGradientColors = (val: number): [string, string] => {
-  if (val <= 25) return ["#22c55e", "#4ade80"]; // green
-  if (val <= 50) return ["#eab308", "#facc15"]; // yellow
-  if (val <= 75) return ["#f97316", "#fb923c"]; // orange
-  return          ["#ef4444", "#f87171"];        // red
+// ── Gradient colors ────────────────────────────────────────────────────────
+// Healthy: two tiers of green based on confidence (darker = more certain)
+// Unhealthy: yellow → orange → red based on confidence (risk level)
+const getGradientColors = (val: number, healthy: boolean): [string, string] => {
+  if (healthy) {
+    // Low confidence healthy (0–50): lighter green — "probably fine"
+    // High confidence healthy (51–100): deep green — "definitely healthy"
+    return val <= 50
+      ? ["#4ade80", "#86efac"]   // light green
+      : ["#16a34a", "#22c55e"];  // deep green
+  }
+  // Unhealthy: confidence = risk level
+  if (val <= 25) return ["#eab308", "#facc15"]; // yellow  — low risk
+  if (val <= 50) return ["#f97316", "#fb923c"]; // orange  — moderate risk
+  return              ["#ef4444", "#f87171"];   // red     — high risk
 };
 
-const RadialConfidence = ({ value }: { value: number }) => {
-  const [from, to] = getGradientColors(value);
+// ── Radial bar ─────────────────────────────────────────────────────────────
+const RadialConfidence = ({
+  value,
+  healthy,
+}: {
+  value: number;
+  healthy: boolean;
+}) => {
+  const [from, to] = getGradientColors(value, healthy);
 
   const options: ApexCharts.ApexOptions = {
     chart: {
@@ -120,15 +137,13 @@ const RadialConfidence = ({ value }: { value: number }) => {
   );
 };
 
-// ── metric prop removed — confidence now comes from context ────────────────
+// ── HomeCard1 ──────────────────────────────────────────────────────────────
 const HomeCard1 = ({ className = "" }: { className?: string }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-
-  // ✅ Single usePrediction call — gets both values at once
   const { predictionResult, confidenceScore } = usePrediction();
 
-  const { data, loading, error, refetch } = useQuery(GET_USER_BY_ID, {
+  const { data, refetch } = useQuery(GET_USER_BY_ID, {
     variables: { userId },
     skip: !userId,
   });
@@ -142,67 +157,81 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
     ? data.getUserById.scanRecords
     : [];
 
-  // Use live predictionResult first; fall back to latest DB record
-  let displayResultRaw =
+  // ── Determine display result ─────────────────────────────────────────────
+  // predictionResult from context comes directly from the Python model:
+  // "healthy" | "diabetes" | null
+  // Fall back to latest DB record if no live result is available.
+  const latestRecord = scanRecords[scanRecords.length - 1];
+  const firstRecord  = scanRecords[0];
+
+  const rawResult =
     predictionResult &&
     predictionResult !== "" &&
     predictionResult !== "Invalid image: Please upload a clear image of an actual tongue."
       ? predictionResult
-      : scanRecords[scanRecords.length - 1]?.result;
+      : Array.isArray(latestRecord?.result)
+        ? latestRecord.result.join(", ")
+        : String(latestRecord?.result ?? "");
 
-  let displayResult = Array.isArray(displayResultRaw)
-    ? displayResultRaw.join(", ")
-    : String(displayResultRaw ?? "");
+  // ── Healthy check ────────────────────────────────────────────────────────
+  // The Python model returns "healthy" or "no disease detected" for healthy scans.
+  // We also guard against any DB record that stores similar strings.
+  const isHealthy =
+    rawResult.toLowerCase() === "healthy" ||
+    rawResult.toLowerCase().includes("no disease") ||
+    rawResult.toLowerCase().includes("healthy");
 
-  // ── Recommended action based on result ────────────────────────────────────
-  let recommendedAction = "Please consult a doctor about your tongue condition.";
-  if (displayResult?.toLowerCase() === "no disease detected") {
-    displayResult = "None";
-    recommendedAction = "Tongue appears healthy. Maintain current healthy lifestyle";
-  }
-
-  // ── Helper: derive health status from the result array ───────────────────
-  // Checks the result field (not notes) so it works with the new note format:
-  // "Model Prediction: X (Y% confidence)"
-  const isHealthyRecord = (record: ScanRecord) => {
-    const r = Array.isArray(record.result)
-      ? record.result.join(", ")
-      : String(record.result ?? "");
-    return r.toLowerCase().includes("no disease") || r.toLowerCase().includes("healthy");
-  };
-
-  const [showHistory, setShowHistory] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<ScanRecord | null>(null);
-
-  const latestRecord = scanRecords[scanRecords.length - 1];
-  const firstRecord  = scanRecords[0];
-
-  // Format Confidence Score
+  // ── Confidence value ─────────────────────────────────────────────────────
+  // confidenceScore from context is 0–100 (set when a live scan is done).
+  // Fall back to parsing it from the notes field of the latest DB record.
   const parseConfidenceFromNotes = (notes: string[]): number => {
     if (!notes?.length) return 0;
     const match = notes[0]?.match(/\((\d+(\.\d+)?)%\s*confidence\)/i);
     return match ? parseFloat(match[1]) : 0;
   };
-  
-  // ── Confidence value drives the radial bar ────────────────────────────────
-  // confidenceScore is 0–100, sourced directly from the scan result via context
-  const confidenceValue = confidenceScore > 0
-    ? confidenceScore
-    : parseConfidenceFromNotes(latestRecord?.notes ?? []);
 
-  const isHealthy = displayResult?.toLowerCase() === "none" || 
-                  displayResult?.toLowerCase().includes("no disease");
+  const confidenceValue =
+    confidenceScore > 0
+      ? confidenceScore
+      : parseConfidenceFromNotes(latestRecord?.notes ?? []);
 
+  // ── Label logic ──────────────────────────────────────────────────────────
+  // For healthy results: label reflects certainty of the healthy diagnosis.
+  // For unhealthy results: label reflects severity/risk level.
   const confidenceLabel = isHealthy
-    ? "Healthy"
-    : confidenceValue <= 25 ? "Low Risk"
-    : confidenceValue <= 50 ? "Moderate Risk"
-    : confidenceValue <= 75 ? "High Risk"
-    : "Very High Risk";
+    ? confidenceValue <= 50
+      ? "Likely Healthy"        // low-confidence healthy
+      : "Confirmed Healthy"     // high-confidence healthy
+    : confidenceValue <= 25
+      ? "Low Risk"
+      : confidenceValue <= 50
+        ? "Moderate Risk"
+        : confidenceValue <= 75
+          ? "High Risk"
+          : "Very High Risk";
 
-  // Pass adjusted value to radial so healthy always shows green
-  const radialValue = isHealthy ? Math.min(confidenceValue, 25) : confidenceValue
-    
+  // ── Recommended action ───────────────────────────────────────────────────
+  const recommendedAction = isHealthy
+    ? "Tongue appears healthy. Maintain your current healthy lifestyle."
+    : "Please consult a doctor about your tongue condition.";
+
+  // ── Display label for conditions present ─────────────────────────────────
+  const displayResult = isHealthy ? "None" : rawResult;
+
+  // ── Helper: check if a specific DB record is healthy ────────────────────
+  const isHealthyRecord = (record: ScanRecord) => {
+    const r = Array.isArray(record.result)
+      ? record.result.join(", ")
+      : String(record.result ?? "");
+    return (
+      r.toLowerCase().includes("no disease") ||
+      r.toLowerCase().includes("healthy")
+    );
+  };
+
+  const [showHistory, setShowHistory] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<ScanRecord | null>(null);
+
   return (
     <div
       className={`bg-gradient-to-tr from-[#6a8ff7] via-[#7eb8f7] to-[#b2ede8]
@@ -226,16 +255,17 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                     year: "numeric", month: "long", day: "numeric",
                   })}
                 </p>
-                {/* ✅ Checks result field, not notes */}
                 <p className="text-sm mb-1">
                   Result:{" "}
                   {isHealthyRecord(firstRecord) ? "Healthy tongue" : "Condition detected"}
                 </p>
                 <p className="text-sm mb-1">Conditions Present:</p>
                 <p className="text-sm mb-3 capitalize">
-                  {Array.isArray(firstRecord.result)
-                    ? firstRecord.result.join(", ")
-                    : firstRecord.result}
+                  {isHealthyRecord(firstRecord)
+                    ? "None"
+                    : Array.isArray(firstRecord.result)
+                      ? firstRecord.result.join(", ")
+                      : firstRecord.result}
                 </p>
                 <div className="flex justify-center">
                   <button
@@ -251,11 +281,12 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
             )}
           </div>
 
-          {/* CENTER — Radial Confidence Chart + Scan Button */}
+          {/* CENTER — Radial chart */}
           <div className="flex flex-col items-center flex-shrink-0 self-end">
             <div className="flex flex-col items-center px-6 pt-4 pb-2">
               <p className="text-white font-semibold text-base mb-1">Tongue Scan Confidence</p>
-              <RadialConfidence value={radialValue} />
+              {/* Pass healthy flag so colors are computed correctly */}
+              <RadialConfidence value={confidenceValue} healthy={isHealthy} />
               <p className="text-white/80 text-sm -mt-2 mb-3">{confidenceLabel}</p>
             </div>
             <Link href="/scan">
@@ -266,36 +297,29 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
             </Link>
           </div>
 
-          {/* RIGHT — Latest scan result */}
+          {/* RIGHT — Latest result */}
           <div className="w-80 h-55 bg-white/20 backdrop-blur-md rounded-3xl p-4 shadow-inner text-white flex-shrink-0">
             <p className="text-lg font-semibold mb-2">Latest Result:</p>
-            {latestRecord ? (
+            {latestRecord || predictionResult ? (
               <>
-                <p className="text-sm mb-1">
-                  Date:{" "}
-                  {new Date(Number(latestRecord.date)).toLocaleDateString("en-US", {
-                    year: "numeric", month: "long", day: "numeric",
-                  })}
-                </p>
-                {/* ✅ Checks result field, not notes */}
+                {latestRecord && (
+                  <p className="text-sm mb-1">
+                    Date:{" "}
+                    {new Date(Number(latestRecord.date)).toLocaleDateString("en-US", {
+                      year: "numeric", month: "long", day: "numeric",
+                    })}
+                  </p>
+                )}
                 <p className="text-sm mb-1">
                   Result:{" "}
-                  {isHealthyRecord(latestRecord)
+                  {isHealthy
                     ? "Healthy Assessment"
-                    : `Signs of ${Array.isArray(latestRecord.result)
-                        ? latestRecord.result.join(", ")
-                        : latestRecord.result} detected`}
+                    : `Signs of ${displayResult} detected`}
                 </p>
-                <p className="text-sm mb-1">Percentage of Risk:</p>
+                <p className="text-sm mb-1">Model Confidence:</p>
                 <p className="text-sm mb-4">
-                  {(() => {
-                    const fromContext = confidenceScore > 0 ? confidenceScore : null;
-                    const fromNotes = parseConfidenceFromNotes(latestRecord.notes ?? []);
-                    const val = fromContext ?? fromNotes;
-                    return val > 0 ? `${val.toFixed(1)}%` : "N/A";
-                  })()}
+                  {confidenceValue > 0 ? `${confidenceValue.toFixed(1)}%` : "N/A"}
                 </p>
-
                 <p className="text-sm font-medium mb-1">Actions to be taken:</p>
                 <p className="text-sm">{recommendedAction}</p>
               </>
@@ -349,16 +373,17 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                       year: "numeric", month: "long", day: "numeric",
                     })}
                   </p>
-                  {/* ✅ Checks result field, not notes */}
                   <p className="text-sm mb-1">
                     Result:{" "}
                     {isHealthyRecord(selectedRecord) ? "Healthy tongue" : "Condition detected"}
                   </p>
                   <p className="text-sm mb-1">Conditions Present:</p>
                   <p className="text-sm mb-1 capitalize">
-                    {Array.isArray(selectedRecord.result)
-                      ? selectedRecord.result.join(", ")
-                      : selectedRecord.result}
+                    {isHealthyRecord(selectedRecord)
+                      ? "None"
+                      : Array.isArray(selectedRecord.result)
+                        ? selectedRecord.result.join(", ")
+                        : selectedRecord.result}
                   </p>
                 </div>
               </div>
