@@ -61,11 +61,11 @@ const ScanPage = () => {
 
   useEffect(() => {
     if (!generatingLime) {
-      setCountdown(70); // reset when done
+      setCountdown(50); // reset when done
       return;
     }
 
-    setCountdown(70);
+    setCountdown(50);
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -608,7 +608,7 @@ const ScanPage = () => {
                   cx="50" cy="50" r="42" fill="none"
                   stroke="white" strokeWidth="8"
                   strokeDasharray={`${2 * Math.PI * 42}`}
-                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 70)}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - countdown / 50)}`}
                   strokeLinecap="round"
                   className="transition-all duration-1000"
                 />

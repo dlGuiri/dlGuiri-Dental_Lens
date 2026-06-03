@@ -45,3 +45,5 @@
 code/teethanalyzer-backend/DentalLens_V6.pth
 code/teethanalyzer-backend/TongueVision_Diabetes_Final_v6.pth
 code/teethanalyzer-backend/TongueVision_Diabetes_Final_v10.pth
+code/teethanalyzer-backend/best.pth
+code/teethanalyzer-backend/sam_vit_b_01ec64.pth

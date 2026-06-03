@@ -316,10 +316,7 @@ const HomeCard1 = ({ className = "" }: { className?: string }) => {
                     ? "Healthy Assessment"
                     : `Signs of ${displayResult} detected`}
                 </p>
-                <p className="text-sm mb-1">Model Confidence:</p>
-                <p className="text-sm mb-4">
-                  {confidenceValue > 0 ? `${confidenceValue.toFixed(1)}%` : "N/A"}
-                </p>
+                <p className="text-sm mb-1">Model Confidence: {confidenceValue > 0 ? `${confidenceValue.toFixed(1)}%` : "N/A"}</p>
                 <p className="text-sm font-medium mb-1">Actions to be taken:</p>
                 <p className="text-sm">{recommendedAction}</p>
               </>
